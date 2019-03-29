@@ -10,12 +10,6 @@
 import numpy as np
 import cv2
 
-box = [[635, 111, 849, 375, 0.92],
-       [658, 131, 891, 426, 0.88],
-       [618, 104, 865, 393, 0.95],
-       [904, 9, 1156, 328, 0.90],
-       [921, 23, 1148, 346, 0.85]]
-
 
 def nms(boxes, thresh=0.3):
     boxes=np.asarray(boxes)
@@ -53,30 +47,37 @@ def nms(boxes, thresh=0.3):
     return keep
 
 
-def plotRectangle(boxes):
+def plotRectangle(boxes, scores):
     """
-    :param img: narray
-    :param location: [xmin,ymin,xmax,ymax]
+
+    :param boxes: list
+    :param scores: list
     :return:
     """
-    img = cv2.imread("/Users/wangjiaxin/Desktop/workspace2/ExercisePython/ML/nms/IMG_3600.PNG")
-
+    filepath = "/Users/wangjiaxin/Desktop/workspace2/ExercisePython/ML/nms/IMG_3600.PNG"
+    img = cv2.imread(filepath)
     xmin = [boxes[i][0] for i in range(len(boxes))]
     ymin = [boxes[i][1] for i in range(len(boxes))]
     xmax = [boxes[i][2] for i in range(len(boxes))]
     ymax = [boxes[i][3] for i in range(len(boxes))]
-    strs=["0.95","0.9"]
-
     linecolor = (0, 255, 0)
     linetype = 3
     font = cv2.FONT_HERSHEY_SIMPLEX
 
     for i in range(len(boxes)):
-        cv2.rectangle(img, (xmin[i],ymin[i]), (xmax[i],ymax[i]), linecolor, linetype)
-        cv2.putText(img,strs[i], (xmin[i]+5,ymax[i]), font, 1.2, (255, 0, 0), 2)
+        cv2.rectangle(img, (xmin[i], ymin[i]), (xmax[i],ymax[i]), linecolor, linetype)
+        cv2.putText(img,scores[i], (xmin[i]+5, ymax[i]), font, 1.2, (255, 0, 0), 2)
     cv2.waitKey(0)
-    cv2.imwrite("./result_labelFace1.jpg", img)  # 存储结果图像
+    cv2.imwrite("nms_pic.jpg", img)  # 存储结果图像
 
 
-b =[box[i][0:4] for i in [2, 3]]
-plotRectangle(b)
+if __name__ == "__main__":
+    box = [[635, 111, 849, 375, 0.92],
+           [658, 131, 891, 426, 0.88],
+           [618, 104, 865, 393, 0.95],
+           [904, 9, 1156, 328, 0.90],
+           [921, 23, 1148, 346, 0.85]]
+    keep = nms(box)
+    keepbox = [box[i][0:4] for i in keep]
+    score = [str(box[i][-1]) for i in keep]
+    plotRectangle(keepbox, score)
